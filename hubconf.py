@@ -1,5 +1,5 @@
 from minerva.models.nets.lfr_har_architectures import HARSCnnEncoder
-dependencies = ["minerva", "torch"]
+#dependencies = ["minerva", "torch"]
 
 
 def harsccencoder(pretrained=False):

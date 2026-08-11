@@ -275,5 +275,9 @@ _register_entrypoints()
 # Entrypoint written by hand during the first test, kept as a reference for the
 # simplest possible shape: one function, one Minerva class.
 def harsccencoder(pretrained=False):
+    # the import has to be inside the function: at module level it would both
+    # slow down torch.hub.list and expose HARSCnnEncoder as an entrypoint
+    from minerva.models.nets.lfr_har_architectures import HARSCnnEncoder
+
     print(pretrained)
-    return HARSCnnEncoder(dim=125, input_channel=6, inner_conv_output_dim=128*10)
+    return HARSCnnEncoder(dim=125, input_channel=6, inner_conv_output_dim=128 * 10)

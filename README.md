@@ -7,10 +7,15 @@ It exposes the 36 SSL + encoder models published on
 `finetuned` checkpoint. The architectures live in
 [Minerva](https://github.com/discovery-unicamp/Minerva), not in this repository.
 
-**All 36 models were validated against Table III of the paper: mean deviation
-0.030 pp, largest 0.10 pp, none beyond 0.5 pp.**
+**All 36 models reproduce their published accuracy within 0.1 pp, which is one
+step of the last digit Table III prints. 33 of the 36 match it exactly.**
 
 ## Quickstart
+
+On [Colab](https://colab.research.google.com/github/gustavo-luz/test_torch_hub/blob/main/colab_quickstart.ipynb),
+open `colab_quickstart.ipynb` and run the cells, nothing to set up locally.
+
+Locally:
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
@@ -59,6 +64,7 @@ Model keys follow `<ssl>_<encoder>_<dataset>`:
 | `evaluate_daghar.py` | Evaluate one model on a DAGHAR test split |
 | `validate_all.py` | Sweep the whole catalog against the paper |
 | `test_torch_hub.ipynb` | Walkthrough of every test, with the findings |
+| `colab_quickstart.ipynb` | Runs on Colab with no local setup: install, load, evaluate |
 
 Only 5 functions are written by hand in `hubconf.py`. The other 42 entrypoints
 are generated at import time from `models.yaml`, so adding a weight to the zoo
@@ -82,11 +88,11 @@ python evaluate_daghar.py                    # lfr_ts2vec_ms on MotionSense
 python evaluate_daghar.py tfc_ts2vec_kh      # another model
 python evaluate_daghar.py lfr_ts2vec_ms uci  # cross-dataset transfer
 
-python validate_all.py                       # all 36, about 11 min on one GPU
+python validate_all.py                       # all 36, about 2 min once cached
 ```
 
-`validate_all.py` writes `validation_results.csv` with accuracy, macro F1 and the
-deviation from the paper for every model.
+`validate_all.py` writes `validation_results.csv` with the accuracy and the
+deviation from the paper for every model, both to one decimal.
 
 ## Findings
 

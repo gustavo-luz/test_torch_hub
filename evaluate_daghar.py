@@ -77,22 +77,22 @@ def main():
         test_dataset(dataset), batch_size=64, num_workers=4
     )
     acc = torchmetrics.Accuracy(task="multiclass", num_classes=6)
-    f1 = torchmetrics.F1Score(task="multiclass", num_classes=6, average="macro")
     confusion = torchmetrics.ConfusionMatrix(task="multiclass", num_classes=6)
 
     with torch.no_grad():
         for x, y in loader:
             pred = model(x).argmax(1)
             acc.update(pred, y)
-            f1.update(pred, y)
             confusion.update(pred, y)
 
-    print(f"accuracy  : {acc.compute().item() * 100:.2f}%")
-    print(f"f1 macro  : {f1.compute().item() * 100:.2f}%")
+    # one decimal, the precision the paper reports
+    measured = round(acc.compute().item() * 100, 1)
+    print(f"accuracy  : {measured}%")
 
     if dataset == spec["dataset"] and spec.get("accuracy"):
-        delta = acc.compute().item() * 100 - spec["accuracy"]
-        print(f"delta vs paper: {delta:+.2f} percentage points")
+        delta = round(measured - spec["accuracy"], 1)
+        verdict = "identical to the paper" if delta == 0 else f"{delta:+.1f} pp"
+        print(f"vs paper  : {verdict}")
 
     print("\nconfusion matrix (row = true, column = predicted)")
     cm = confusion.compute()

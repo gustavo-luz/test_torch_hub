@@ -1,0 +1,462 @@
+# Model zoo catalog, generated from ssl_har_model_zoo.ipynb.
+# The 36 models published at https://zenodo.org/records/19301058,
+# each with a pretrained and a finetuned checkpoint.
+#
+# hubconf.py reads this file at run time. Adding a new weight to the zoo
+# means adding an entry here, no code changes.
+
+# Encoder architectures, same arguments as the paper.
+encoders:
+  ts2vec:
+    module: minerva.models.nets.tnc
+    cls: TSEncoder
+    kwargs:
+      input_dims: 6
+      output_dims: 320
+      hidden_dims: 64
+      depth: 10
+      permute: true
+  cnnpff:
+    module: minerva.models.nets.time_series.cnns
+    cls: CNN_PF_Backbone
+    kwargs:
+      include_middle: true
+      flatten: true
+  resnetse5:
+    module: minerva.models.nets.time_series.resnet
+    cls: _ResNet1D
+    kwargs:
+      input_shape: [6, 60]
+      avg_pooling: true
+      residual_block_cls: ResNetSEBlock   # class resolved by hubconf
+  rnn:
+    module: minerva.models.nets.tnc
+    cls: RnnEncoder
+    kwargs:
+      hidden_size: 100
+      in_channel: 6
+      encoding_size: 320
+      cell_type: "GRU"
+      num_layers: 1
+      dropout: 0
+      bidirectional: true
+      permute: true
+  imutransformer:
+    module: minerva.models.nets.time_series.imu_transformer
+    cls: _IMUTransformerEncoder
+    kwargs:
+      input_shape: [6, 60]
+      transformer_dim: 64
+      encode_position: true
+      nhead: 8
+      dim_feedforward: 128
+      transformer_dropout: 0.1
+      transformer_activation: "gelu"
+      num_encoder_layers: 6
+      permute: false
+  tstcc:
+    module: minerva.models.nets.lfr_har_architectures
+    cls: HARSCnnEncoder
+    kwargs:
+      dim: 2304
+      input_channel: 6
+      inner_conv_output_dim: 1280
+
+# One block per model. The key is the torch.hub entrypoint name.
+models:
+  diet_resnetse5_kh:
+    ssl: diet
+    encoder: resnetse5
+    dataset: kh
+    dataset_name: "KuHar"
+    num_classes: 6
+    head_input_dim: 64
+    accuracy: 80.6   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/diet_resnetse5_kh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/diet_resnetse5_kh_finetuned.ckpt
+  diet_resnetse5_uci:
+    ssl: diet
+    encoder: resnetse5
+    dataset: uci
+    dataset_name: "UCI-HAR"
+    num_classes: 6
+    head_input_dim: 64
+    accuracy: 95.9   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/diet_resnetse5_uci_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/diet_resnetse5_uci_finetuned.ckpt
+  lfr_imutransformer_kh:
+    ssl: lfr
+    encoder: imutransformer
+    dataset: kh
+    dataset_name: "KuHar"
+    num_classes: 6
+    head_input_dim: 64
+    accuracy: 77.1   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/lfr_imutransformer_kh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/lfr_imutransformer_kh_finetuned.ckpt
+  lfr_imutransformer_rwthigh:
+    ssl: lfr
+    encoder: imutransformer
+    dataset: rwthigh
+    dataset_name: "RealWorld Thigh"
+    num_classes: 6
+    head_input_dim: 64
+    accuracy: 72.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/lfr_imutransformer_rwthigh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/lfr_imutransformer_rwthigh_finetuned.ckpt
+  lfr_imutransformer_rwwaist:
+    ssl: lfr
+    encoder: imutransformer
+    dataset: rwwaist
+    dataset_name: "RealWorld Waist"
+    num_classes: 6
+    head_input_dim: 64
+    accuracy: 80.1   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/lfr_imutransformer_rwwaist_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/lfr_imutransformer_rwwaist_finetuned.ckpt
+  lfr_resnetse5_ms:
+    ssl: lfr
+    encoder: resnetse5
+    dataset: ms
+    dataset_name: "MotionSense"
+    num_classes: 6
+    head_input_dim: 64
+    accuracy: 93.8   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/lfr_resnetse5_ms_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/lfr_resnetse5_ms_finetuned.ckpt
+  lfr_ts2vec_ms:
+    ssl: lfr
+    encoder: ts2vec
+    dataset: ms
+    dataset_name: "MotionSense"
+    num_classes: 6
+    head_input_dim: 320
+    accuracy: 97.5   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/lfr_ts2vec_ms_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/lfr_ts2vec_ms_finetuned.ckpt
+  lfr_tstcc_ms:
+    ssl: lfr
+    encoder: tstcc
+    dataset: ms
+    dataset_name: "MotionSense"
+    num_classes: 6
+    head_input_dim: 2304
+    accuracy: 92.8   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/lfr_tstcc_ms_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/lfr_tstcc_ms_finetuned.ckpt
+  lfr_tstcc_rwthigh:
+    ssl: lfr
+    encoder: tstcc
+    dataset: rwthigh
+    dataset_name: "RealWorld Thigh"
+    num_classes: 6
+    head_input_dim: 2304
+    accuracy: 74.9   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/lfr_tstcc_rwthigh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/lfr_tstcc_rwthigh_finetuned.ckpt
+  tfc_cnnpff_kh:
+    ssl: tfc
+    encoder: cnnpff
+    dataset: kh
+    dataset_name: "KuHar"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 81.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_cnnpff_kh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_cnnpff_kh_finetuned.ckpt
+  tfc_cnnpff_ms:
+    ssl: tfc
+    encoder: cnnpff
+    dataset: ms
+    dataset_name: "MotionSense"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 95.0   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_cnnpff_ms_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_cnnpff_ms_finetuned.ckpt
+  tfc_cnnpff_rwthigh:
+    ssl: tfc
+    encoder: cnnpff
+    dataset: rwthigh
+    dataset_name: "RealWorld Thigh"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 81.5   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_cnnpff_rwthigh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_cnnpff_rwthigh_finetuned.ckpt
+  tfc_cnnpff_rwwaist:
+    ssl: tfc
+    encoder: cnnpff
+    dataset: rwwaist
+    dataset_name: "RealWorld Waist"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 81.8   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_cnnpff_rwwaist_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_cnnpff_rwwaist_finetuned.ckpt
+  tfc_cnnpff_uci:
+    ssl: tfc
+    encoder: cnnpff
+    dataset: uci
+    dataset_name: "UCI-HAR"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 96.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_cnnpff_uci_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_cnnpff_uci_finetuned.ckpt
+  tfc_cnnpff_wisdm:
+    ssl: tfc
+    encoder: cnnpff
+    dataset: wisdm
+    dataset_name: "WISDM"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 91.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_cnnpff_wisdm_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_cnnpff_wisdm_finetuned.ckpt
+  tfc_imutransformer_ms:
+    ssl: tfc
+    encoder: imutransformer
+    dataset: ms
+    dataset_name: "MotionSense"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 89.7   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_imutransformer_ms_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_imutransformer_ms_finetuned.ckpt
+  tfc_imutransformer_uci:
+    ssl: tfc
+    encoder: imutransformer
+    dataset: uci
+    dataset_name: "UCI-HAR"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 92.3   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_imutransformer_uci_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_imutransformer_uci_finetuned.ckpt
+  tfc_imutransformer_wisdm:
+    ssl: tfc
+    encoder: imutransformer
+    dataset: wisdm
+    dataset_name: "WISDM"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 89.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_imutransformer_wisdm_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_imutransformer_wisdm_finetuned.ckpt
+  tfc_resnetse5_rwthigh:
+    ssl: tfc
+    encoder: resnetse5
+    dataset: rwthigh
+    dataset_name: "RealWorld Thigh"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 82.8   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_resnetse5_rwthigh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_resnetse5_rwthigh_finetuned.ckpt
+  tfc_resnetse5_rwwaist:
+    ssl: tfc
+    encoder: resnetse5
+    dataset: rwwaist
+    dataset_name: "RealWorld Waist"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 79.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_resnetse5_rwwaist_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_resnetse5_rwwaist_finetuned.ckpt
+  tfc_resnetse5_wisdm:
+    ssl: tfc
+    encoder: resnetse5
+    dataset: wisdm
+    dataset_name: "WISDM"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 86.9   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_resnetse5_wisdm_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_resnetse5_wisdm_finetuned.ckpt
+  tfc_rnn_kh:
+    ssl: tfc
+    encoder: rnn
+    dataset: kh
+    dataset_name: "KuHar"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 74.3   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_rnn_kh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_rnn_kh_finetuned.ckpt
+  tfc_rnn_ms:
+    ssl: tfc
+    encoder: rnn
+    dataset: ms
+    dataset_name: "MotionSense"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 92.0   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_rnn_ms_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_rnn_ms_finetuned.ckpt
+  tfc_rnn_rwthigh:
+    ssl: tfc
+    encoder: rnn
+    dataset: rwthigh
+    dataset_name: "RealWorld Thigh"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 81.0   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_rnn_rwthigh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_rnn_rwthigh_finetuned.ckpt
+  tfc_rnn_rwwaist:
+    ssl: tfc
+    encoder: rnn
+    dataset: rwwaist
+    dataset_name: "RealWorld Waist"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 82.1   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_rnn_rwwaist_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_rnn_rwwaist_finetuned.ckpt
+  tfc_rnn_uci:
+    ssl: tfc
+    encoder: rnn
+    dataset: uci
+    dataset_name: "UCI-HAR"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 94.9   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_rnn_uci_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_rnn_uci_finetuned.ckpt
+  tfc_rnn_wisdm:
+    ssl: tfc
+    encoder: rnn
+    dataset: wisdm
+    dataset_name: "WISDM"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 89.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_rnn_wisdm_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_rnn_wisdm_finetuned.ckpt
+  tfc_ts2vec_kh:
+    ssl: tfc
+    encoder: ts2vec
+    dataset: kh
+    dataset_name: "KuHar"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 90.3   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_ts2vec_kh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_ts2vec_kh_finetuned.ckpt
+  tfc_ts2vec_rwthigh:
+    ssl: tfc
+    encoder: ts2vec
+    dataset: rwthigh
+    dataset_name: "RealWorld Thigh"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 81.2   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_ts2vec_rwthigh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_ts2vec_rwthigh_finetuned.ckpt
+  tfc_ts2vec_rwwaist:
+    ssl: tfc
+    encoder: ts2vec
+    dataset: rwwaist
+    dataset_name: "RealWorld Waist"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 82.5   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_ts2vec_rwwaist_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_ts2vec_rwwaist_finetuned.ckpt
+  tfc_ts2vec_uci:
+    ssl: tfc
+    encoder: ts2vec
+    dataset: uci
+    dataset_name: "UCI-HAR"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 96.1   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_ts2vec_uci_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_ts2vec_uci_finetuned.ckpt
+  tfc_ts2vec_wisdm:
+    ssl: tfc
+    encoder: ts2vec
+    dataset: wisdm
+    dataset_name: "WISDM"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 90.7   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_ts2vec_wisdm_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_ts2vec_wisdm_finetuned.ckpt
+  tfc_tstcc_kh:
+    ssl: tfc
+    encoder: tstcc
+    dataset: kh
+    dataset_name: "KuHar"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 73.6   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_tstcc_kh_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_tstcc_kh_finetuned.ckpt
+  tfc_tstcc_rwwaist:
+    ssl: tfc
+    encoder: tstcc
+    dataset: rwwaist
+    dataset_name: "RealWorld Waist"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 76.5   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_tstcc_rwwaist_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_tstcc_rwwaist_finetuned.ckpt
+  tfc_tstcc_uci:
+    ssl: tfc
+    encoder: tstcc
+    dataset: uci
+    dataset_name: "UCI-HAR"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 94.3   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_tstcc_uci_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_tstcc_uci_finetuned.ckpt
+  tfc_tstcc_wisdm:
+    ssl: tfc
+    encoder: tstcc
+    dataset: wisdm
+    dataset_name: "WISDM"
+    num_classes: 6
+    head_input_dim: 256
+    accuracy: 88.9   # best accuracy from the paper, Table III
+    weights:
+      pretrained: https://zenodo.org/records/19301058/files/tfc_tstcc_wisdm_pretrained.ckpt
+      finetuned: https://zenodo.org/records/19301058/files/tfc_tstcc_wisdm_finetuned.ckpt
